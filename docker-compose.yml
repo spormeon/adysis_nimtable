@@ -1,0 +1,31 @@
+services:
+  nimtable-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: nimtable
+      POSTGRES_USER: nimtable
+      POSTGRES_PASSWORD: nimtable
+    volumes:
+      - nimtable_pg:/var/lib/postgresql/data
+
+  nimtable:
+    image: nimtable/nimtable:latest
+    depends_on:
+      - nimtable-db
+    ports:
+      - "3000:3000"
+    environment:
+      # initial admin (only used until you change it in UI)
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      # ---- YOUR CATALOG SETTINGS (passed at runtime) ----
+      R2_CATALOG_URI: ${R2_CATALOG_URI}
+      R2_WAREHOUSE: ${R2_WAREHOUSE}
+      CF_API_TOKEN: ${CF_API_TOKEN}
+
+      # DB connection
+      DATABASE_URL: postgres://nimtable:nimtable@nimtable-db:5432/nimtable
+
+volumes:
+  nimtable_pg:
